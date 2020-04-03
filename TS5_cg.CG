@@ -1,0 +1,42 @@
+void main( in  varying float4 ipos : POSITION,
+           in varying float3 inorm : NORMAL,
+           out varying float4 ocol : COLOR,
+           out varying float4 opos : POSITION,
+           out varying float3 onorm : TEXCOORD1,
+           
+           in uniform float time ) 
+{
+  float4 c = {0, 1, 0, 1};
+  
+  //float4x4 ModelViewIT = glstate.matrix.invtrans.modelview[0];
+  //onorm = normalize(mul(ModelViewIT, inorm));
+  onorm = float4(5, 5, 5, 1) * normalize(mul(glstate.matrix.invtrans.modelview[0], float4(inorm, 1)));
+ 
+  opos = mul(glstate.matrix.mvp, ipos);
+  ocol = float4(sin(time), fmod(time, 1), fmod(ipos.y, 1), 0);
+}
+
+float4 start( float4 col : COLOR,
+              float3 normal : TEXCOORD1,
+              uniform float time ) : COLOR
+{
+  float4 L = {1, 11, 1, 0};
+  
+  L = normalize(L);
+  
+  float r = dot(L, normal) * 0.1;
+  float4 rr = reflect(float4(0, 0, 1, 0), float4(normal, 0));
+  float rrr = pow((-dot(L, rr)), 5);
+  
+  return  (r + rrr) * float4(1, 0, 0, 1);
+}
+
+float4 start1( float2 tex : TEXCOORD0 ) : COLOR
+{
+  // original pixel
+  float4 ci = {-1, -1, -1, -1}, co = {1, 1, 1, 1};
+  float4 c0 = tex2D(s0,tex);
+
+  c0 = ci * c0 + co;
+  return c0;
+}
